@@ -1,63 +1,65 @@
-**QR Code Reader and Creator Offline**
-=====================================
+# Simple QR Code App
 
-**Introduction**
---------------
+A lightweight, offline QR code generator and reader built with Python and Tkinter.  
+Works on Windows, macOS, and Linux.
 
-This repository aims to create a QR Code reader and creator that can be executed on different platforms (Windows, macOS, Linux, Android and iOS) without the need for internet connection or installation.
-Desirably, it should be POSIX compliant.
+## Quick Start
 
-**STATUS**
-------------
-Desktop version working with plain text.
+```bash
+git clone https://github.com/youruser/simple-qr-code-app.git
+cd simple-qr-code-app
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python qr-code-app.py
+```
 
-**Requirements**
-------------
+## End‑User Guide
 
-* Hardware requirements: Basic computer or mobile device resources
+- **Generate a QR Code** – Type text or a URL, click **Generate QR Code**.  
+  The image appears below; click **Save QR Code** to export as PNG.
+- **Read from Camera** – Click **Read QR Code from Camera** and point the webcam at a QR code.  
+  The decoded data pops up; press **q** to stop the camera.
 
-**Features**
-------------
+## Developer Guide
 
-* Create custom QR Codes - Check https://github.com/zxing/zxing/wiki/Barcode-Contents
-    * Plain text
-    * URL
-    * Geo Location
-    * Calendar data
-    * Email Address
-    * Phone number
-    * SMS
-    * Contact Data
-* Read existing QR Codes with camera
+### Project layout
 
-**Getting Started**
-------------------
+```
+qr-code-app.py          # Main application
+requirements.txt        # Python dependencies
+```
 
-1. Clone the repository to your computer.
-2. Create a new branch for your changes.
-3. Start developing the project.
-4. Implement the required features.
-5. Test and refine the application.
+### Dependencies
 
-**To-Do List**
---------------
+```text
+opencv-python
+pillow
+qrcode[pil]
+```
 
-* Implement support for different OS
-* Create a detailed documentation for the application
-* Improve the application security
+> `tkinter` is bundled with Python on Windows/macOS.  
+> On Linux you may need `python3-tk`.
 
-**Architecture**
---------------
+### Building a standalone executable
 
-Work in progress
+```bash
+pip install pyinstaller
+# On Linux/macOS
+pyinstaller --onefile qr-code-app.py
+# On Windows (run the command on a Windows machine)
+pyinstaller --onefile qr-code-app.py
+```
 
-**Contributing**
---------------
+The executable will be located in `dist/`.
 
-If you'd like to contribute to this project, please follow these steps:
+## Contributing
 
-* Clone the repository to your computer.
-* Create a new branch for your changes.
-* Make the necessary changes.
-* Commit the changes to the repository.
-* Open a pull request for the changes to be reviewed and approved.
+1. Fork the repository.  
+2. Create a topic branch: `git checkout -b feat/…`.  
+3. Run the app and any tests you add.  
+4. Open a pull request.
+
+## License
+
+MIT © 2026 Simple QR Code App

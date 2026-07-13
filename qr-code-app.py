@@ -3,6 +3,7 @@ import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
+import cv2
 import qrcode
 from PIL import Image, ImageTk
 
@@ -35,10 +36,22 @@ class QRCodeApp:
         )
         self.camera_button.pack(pady=5)
 
+        self.scan_result_frame = tk.Frame(root)
+        self.scan_result_var = tk.StringVar()
+        self.scan_result_entry = tk.Entry(
+            self.scan_result_frame, textvariable=self.scan_result_var,
+            width=32, state="readonly"
+        )
+        self.scan_result_entry.pack(side=tk.LEFT, padx=(0, 4))
+        self.copy_button = tk.Button(
+            self.scan_result_frame, text="Copy", command=self.copy_scan_result
+        )
+        self.copy_button.pack(side=tk.LEFT)
+
         self.qr_label = tk.Label(root)
         self.qr_label.pack(pady=10)
 
-        self.qr_image = None  # Para armazenar o QR Code gerado
+        self.qr_image = None
 
     def generate_qr(self):
         data = self.entry.get()
@@ -82,30 +95,61 @@ class QRCodeApp:
         self.qr_image.save(file_path)
         messagebox.showinfo("Success", f"QR Code saved as {file_path}")
 
+    def show_scan_result(self, data):
+        self.scan_result_var.set(data)
+        self.scan_result_frame.pack(pady=5)
+        self.root.clipboard_clear()
+        self.root.clipboard_append(data)
+
+    def copy_scan_result(self):
+        data = self.scan_result_var.get()
+        if data:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(data)
+
     def read_qr_from_camera(self):
         cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            messagebox.showerror("Error", "Cannot open camera!")
+            return
+
         detector = cv2.QRCodeDetector()
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
+        cam_window = tk.Toplevel(self.root)
+        cam_window.title("QR Code Scanner - Close window to exit")
+        cam_label = tk.Label(cam_window)
+        cam_label.pack()
 
-            data, bbox, _ = detector.detectAndDecode(frame)
+        def close_camera():
+            cap.release()
+            cam_window.destroy()
 
-            if bbox is not None and data:
-                messagebox.showinfo("QR Code Data", f"QR Code: {data}")
-                cap.release()
-                cv2.destroyAllWindows()
+        cam_window.protocol("WM_DELETE_WINDOW", close_camera)
+
+        def update_frame():
+            if not cam_window.winfo_exists():
                 return
 
-            cv2.imshow("QR Code Scanner - Press 'q' to exit", frame)
+            ret, frame = cap.read()
+            if not ret:
+                close_camera()
+                return
 
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
+            data, bbox, _ = detector.detectAndDecode(frame)
+            if bbox is not None and data:
+                close_camera()
+                self.show_scan_result(data)
+                return
 
-        cap.release()
-        cv2.destroyAllWindows()
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(frame_rgb)
+            img_tk = ImageTk.PhotoImage(img)
+            cam_label.config(image=img_tk)
+            cam_label.image = img_tk
+
+            cam_window.after(30, update_frame)
+
+        update_frame()
 
 
 if __name__ == "__main__":

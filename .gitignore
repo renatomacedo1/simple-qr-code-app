@@ -1,0 +1,13 @@
+# Venv
+qr/
+venv/
+
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
